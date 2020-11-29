@@ -69,11 +69,60 @@ def upload_testset_from_url():
 
 @app.route('/upload-model/', methods=['POST'])
 def upload_model():
-    pass
+    try:
+        f = request.files['model']
+        with zipfile.ZipFile(f) as z:
+            if not all(name.startswith('model/') for name in z.namelist()):
+                return {
+                    'status': 'error',
+                    'message': 'Zip achive should only contain model folder',
+                }, 400
+            z.extractall('.')
+    except (BadRequestKeyError, BadZipFile) as e:
+        app.logger.error(repr(e))
+        return {
+            'status': 'error',
+            'message': str(e),
+        }, 400
+    except Exception as e:
+        app.logger.error(repr(e))
+        return {
+            'status': 'error',
+            'message': str(e),
+        }, 500
+    else:
+        return {
+            'status': 'ok'
+        }, 200
 
 @app.route('/upload-model-from-url/', methods=['POST'])
 def upload_model_from_url():
-    pass
+    try:
+        url = request.json['url']
+        r = requests.get(url, stream=True)
+        with zipfile.ZipFile(io.BytesIO(r.content)) as z:
+            if not all(name.startswith('model/') for name in z.namelist()):
+                return {
+                    'status': 'error',
+                    'message': 'Zip achive should only contain model folder',
+                }, 400
+            z.extractall('.')
+    except (KeyError, BadZipFile) as e:
+        app.logger.error(repr(e))
+        return {
+            'status': 'error',
+            'message': str(e),
+        }, 400
+    except Exception as e:
+        app.logger.error(repr(e))
+        return {
+            'status': 'error',
+            'message': str(e),
+        }, 500
+    else:
+        return {
+            'status': 'ok'
+        }
 
 @app.route('/evaluate/', methods=['GET'])
 def evaluate_model():

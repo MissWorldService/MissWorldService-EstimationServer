@@ -1,6 +1,8 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
+import zipfile
+import os
 
 def get_model():
     # Create a simple model.
@@ -18,17 +20,17 @@ test_input = np.random.random((128, 32))
 test_target = np.random.random((128, 1))
 model.fit(test_input, test_target)
 
-# Calling `save('my_model')` creates a SavedModel folder `my_model`.
-model.save("my_model")
+# Calling `save('my_model')` creates a SavedModel folder `model`.
+model.save("model")
 
-# It can be used to reconstruct the model identically.
-reconstructed_model = keras.models.load_model("my_model")
+# # It can be used to reconstruct the model identically.
+# reconstructed_model = keras.models.load_model("my_model")
 
-# Let's check:
-np.testing.assert_allclose(
-    model.predict(test_input), reconstructed_model.predict(test_input)
-)
+# # Let's check:
+# np.testing.assert_allclose(
+#     model.predict(test_input), reconstructed_model.predict(test_input)
+# )
 
-# The reconstructed model is already compiled and has retained the optimizer
-# state, so training can resume:
-reconstructed_model.fit(test_input, test_target)
+# # The reconstructed model is already compiled and has retained the optimizer
+# # state, so training can resume:
+# reconstructed_model.fit(test_input, test_target)
