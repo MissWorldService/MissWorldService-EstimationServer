@@ -38,6 +38,8 @@ def predict(x):
         x = x.tolist()
     data = {'instances': x}
     response = requests.post(TF_SERVING_URL, json=data)
+    if 'error' in response.json():
+        raise ValueError(response.json()['error'])
     y_pred = response.json()['predictions']
     return y_pred
 
@@ -57,17 +59,17 @@ def calculate_classification_metrics(y_true, y_pred):
 def calculate_regression_metrics(y_true, y_pred):
     return calculate_metrics(y_true, y_pred, REGRESSION_METRICS)
 
-def evaluate_model(x_test, y_test, type):
+def evaluate_model(x_test, y_test, type_):
     y_pred = predict(x_test)
-    if type == 'regression':
+    if type_ == 'regression':
         return calculate_regression_metrics(y_test, y_pred)
-    elif type == 'classification':
+    elif type_ == 'classification':
         return calculate_classification_metrics(y_test, y_pred)
     else:
-        raise NotImplementedError(f'Invalid type: {type}')
+        raise NotImplementedError(f'Invalid type: {type_}')
 
 
 if __name__ == '__main__':
     x_test = np.random.randint(0, 100, size=1000)
     y_test = x_test / 2 + 2
-    pprint(evaluate_model(x_test, y_test, type='regression'))
+    pprint(evaluate_model(x_test, y_test, type_='regression'))
