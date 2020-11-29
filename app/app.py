@@ -1,8 +1,10 @@
 from flask import Flask, request
 from werkzeug.local import Local
+from werkzeug.exceptions import BadRequestKeyError
 import requests
 import numpy
 import zipfile 
+from zipfile import BadZipFile
 import io
 
 import model_metrics
@@ -20,7 +22,26 @@ def ping():
 
 @app.route('/upload-testset/', methods=['POST'])
 def upload_testset():
-    pass
+    try:
+        f = request.files['testset']
+        with zipfile.ZipFile(f) as z:
+            z.extractall('testset/')
+    except (BadRequestKeyError, BadZipFile) as e:
+        app.logger.error(repr(e))
+        return {
+            'status': 'error',
+            'message': str(e),
+        }, 400
+    except Exception as e:
+        app.logger.error(repr(e))
+        return {
+            'status': 'error',
+            'message': str(e),
+        }, 500
+    else:
+        return {
+            'status': 'ok'
+        }, 200
 
 @app.route('/upload-testset-from-url/', methods=['POST'])
 def upload_testset_from_url():
@@ -29,6 +50,12 @@ def upload_testset_from_url():
         r = requests.get(url, stream=True)
         with zipfile.ZipFile(io.BytesIO(r.content)) as z:
             z.extractall('testset/')
+    except (KeyError, BadZipFile) as e:
+        app.logger.error(repr(e))
+        return {
+            'status': 'error',
+            'message': str(e),
+        }, 400
     except Exception as e:
         app.logger.error(repr(e))
         return {
