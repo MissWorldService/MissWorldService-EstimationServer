@@ -1,4 +1,5 @@
 numpy
 requests
+werkzeug
 flask
 sklearn
