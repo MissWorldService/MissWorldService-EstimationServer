@@ -1,3 +1,4 @@
+# https://www.marktechpost.com/2019/06/17/regression-with-keras-deep-learning-with-keras-part-3/
 from keras.datasets import boston_housing
 from sklearn.preprocessing import StandardScaler
 from keras import models, layers

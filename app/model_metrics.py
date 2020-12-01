@@ -5,39 +5,19 @@ import sklearn.metrics
 import os
 
 from conf import X_TEST_NAME, Y_TEST_NAME, MODEL_NAME
+from conf import CLASSIFICATION_METRICS, REGRESSION_METRICS
 
-CLASSIFICATION_METRICS = [
-    'accuracy_score',
-    'f1_score',
-    'fbeta_score',
-    'hamming_loss',
-    'jaccard_score',
-    'log_loss',
-    'precision_score',
-    'recall_score',
-    'roc_auc_score',
-    'zero_one_loss',
-]
-
-REGRESSION_METRICS = [
-    'explained_variance_score',
-    'max_error',
-    'mean_absolute_error',
-    'mean_squared_error',
-    'mean_squared_log_error',
-    'median_absolute_error',
-    'r2_score',
-    'mean_poisson_deviance',
-    'mean_gamma_deviance',
-]
 def evaluate_classification_model():
     x_test = np.load(X_TEST_NAME)
     y_test = np.load(Y_TEST_NAME)
     model = keras.models.load_model(MODEL_NAME)
     y_pred = model.predict(x_test)
     
-    y_pred = np.argmax(y_pred, axis=-1)
-    y_test = np.argmax(y_test, axis=-1)
+    if y_test.ndim == 1:
+        y_pred = np.round(y_pred)
+    else:
+        y_pred = np.argmax(y_pred, axis=-1)
+        y_test = np.argmax(y_test, axis=-1)
 
     result = {}
     for metric in CLASSIFICATION_METRICS:
@@ -50,7 +30,6 @@ def evaluate_classification_model():
             pass
 
     return result
-
 
 def evaluate_regression_model():
     x_test = np.load(X_TEST_NAME)
@@ -69,3 +48,4 @@ def evaluate_regression_model():
 
 if __name__ == '__main__':
     print(evaluate_regression_model())
+    print(evaluate_classification_model())
