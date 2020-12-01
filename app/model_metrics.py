@@ -19,7 +19,18 @@ CLASSIFICATION_METRICS = [
     'zero_one_loss',
 ]
 
-def evaluate_model():
+REGRESSION_METRICS = [
+    'explained_variance_score',
+    'max_error',
+    'mean_absolute_error',
+    'mean_squared_error',
+    'mean_squared_log_error',
+    'median_absolute_error',
+    'r2_score',
+    'mean_poisson_deviance',
+    'mean_gamma_deviance',
+]
+def evaluate_classification_model():
     x_test = np.load(X_TEST_NAME)
     y_test = np.load(Y_TEST_NAME)
     model = keras.models.load_model(MODEL_NAME)
@@ -41,5 +52,20 @@ def evaluate_model():
     return result
 
 
+def evaluate_regression_model():
+    x_test = np.load(X_TEST_NAME)
+    y_test = np.load(Y_TEST_NAME)
+    model = keras.models.load_model(MODEL_NAME)
+    y_pred = model.predict(x_test)
+
+    result = {}
+    for metric in REGRESSION_METRICS:
+        try:
+            result[metric] = getattr(sklearn.metrics, metric)(y_test, y_pred)
+        except:
+            pass
+
+    return result
+
 if __name__ == '__main__':
-    print(evaluate_model())
+    print(evaluate_regression_model())

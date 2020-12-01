@@ -1,25 +1,20 @@
 from flask import Flask, request
-from werkzeug.local import Local
 from werkzeug.exceptions import BadRequestKeyError
 import requests
 import numpy as np
 import zipfile 
 from zipfile import BadZipFile
 import io
-import os
 
 import model_metrics
 from conf import X_TEST_NAME, Y_TEST_NAME, MODEL_NAME
 
 app = Flask(__name__)
-loc = Local()
-loc.busy = False
-
 
 @app.route('/ping/')
 def ping():
     return {
-        'status': 'busy' if loc.busy else 'ready',
+        'status': 'ok',
     }
 
 def upload_testset_from_zipfile(f):
@@ -114,9 +109,24 @@ def upload_model_from_url():
 
 @app.route('/evaluate/', methods=['GET'])
 def evaluate_model():
-    loc.busy = True
     try:
-        result = model_metrics.evaluate_model()
+        type_ = request.json['type']
+    except Exception as e:
+        return {
+            'status': 'error',
+            'message': 'Parameter type is missing',
+        }, 400
+
+    try:
+        if type_ == 'regression':
+            result = model_metrics.evaluate_regression_model()
+        elif type_ == 'classification':
+            result = model_metrics.evaluate_classification_model()
+        else:
+            return {
+                'status': 'error',
+                'message': f'Invalid type: {type_}',
+            }, 400
     except Exception as e:
         return {
             'status': 'error',
@@ -127,8 +137,6 @@ def evaluate_model():
             'status': 'ok',
             'metrics': result,
         }
-    finally:
-        loc.busy = False
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

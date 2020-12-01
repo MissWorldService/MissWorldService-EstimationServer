@@ -4,6 +4,7 @@ import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.optimizers import SGD
+import zipfile
 
 
 # Generate dummy data
@@ -34,3 +35,6 @@ model.fit(x_train, y_train,
 np.save('x_test.npy', x_test)
 np.save('y_test.npy', y_test)
 model.save('model.h5')
+with zipfile.ZipFile('testset.zip', 'w') as z:
+    z.write('x_test.npy')
+    z.write('y_test.npy')
