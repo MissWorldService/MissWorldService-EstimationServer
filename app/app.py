@@ -9,9 +9,7 @@ import io
 import os
 
 import model_metrics
-
-X_TEST_NAME = 'xtest.npy'
-Y_TEST_NAME = 'ytest.npy'
+from conf import X_TEST_NAME, Y_TEST_NAME, MODEL_NAME
 
 app = Flask(__name__)
 loc = Local()
@@ -125,8 +123,8 @@ def upload_model_from_url():
 def evaluate_model():
     loc.busy = True
     try:
-        x_test = np.load(f'testset/{X_TEST_NAME}')
-        y_test = np.load(f'testset/{Y_TEST_NAME}')
+        x_test = np.load(X_TEST_NAME)
+        y_test = np.load(Y_TEST_PATH)
         type_ = request.json['type']
         if not type_ in ('regression', 'classification'):
             return {
