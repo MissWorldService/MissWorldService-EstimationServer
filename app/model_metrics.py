@@ -28,9 +28,6 @@ def evaluate_model():
     y_pred = np.argmax(y_pred, axis=-1)
     y_test = np.argmax(y_test, axis=-1)
 
-    print(y_pred)
-    print(y_test)
-
     result = {}
     for metric in CLASSIFICATION_METRICS:
         try:
