@@ -43,9 +43,9 @@ def evaluate_classification_model():
     for metric in CLASSIFICATION_METRICS:
         try:
             try:
-                result[metric] = getattr(sklearn.metrics, metric)(y_test, y_pred)
+                result[metric] = float(getattr(sklearn.metrics, metric)(y_test, y_pred))
             except ValueError:
-                result[metric] = getattr(sklearn.metrics, metric)(y_test, y_pred, average='micro')
+                result[metric] = float(getattr(sklearn.metrics, metric)(y_test, y_pred, average='micro'))
         except:
             pass
 
@@ -61,7 +61,7 @@ def evaluate_regression_model():
     result = {}
     for metric in REGRESSION_METRICS:
         try:
-            result[metric] = getattr(sklearn.metrics, metric)(y_test, y_pred)
+            result[metric] = float(getattr(sklearn.metrics, metric)(y_test, y_pred))
         except:
             pass
 
