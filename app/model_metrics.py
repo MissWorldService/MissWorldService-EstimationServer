@@ -1,11 +1,10 @@
 import requests
 import numpy as np
+import keras
 import sklearn.metrics
-from pprint import pprint
+import os
 
-
-TF_SERVING_URL = 'http://localhost:8501/v1/models/model:predict'
-
+from conf import X_TEST_NAME, Y_TEST_NAME, MODEL_NAME
 
 CLASSIFICATION_METRICS = [
     'accuracy_score',
@@ -20,56 +19,27 @@ CLASSIFICATION_METRICS = [
     'zero_one_loss',
 ]
 
-REGRESSION_METRICS = [
-    'explained_variance_score',
-    'max_error',
-    'mean_absolute_error',
-    'mean_squared_error',
-    'mean_squared_log_error',
-    'median_absolute_error',
-    'r2_score',
-    'mean_poisson_deviance',
-    'mean_gamma_deviance',
-]
+def evaluate_model():
+    x_test = np.load(X_TEST_NAME)
+    y_test = np.load(Y_TEST_NAME)
+    model = keras.models.load_model(MODEL_NAME)
+    y_pred = model.predict(x_test)
+    
+    y_pred = np.argmax(y_pred, axis=-1)
+    y_test = np.argmax(y_test, axis=-1)
 
-def predict(x):
-    """Make predictions using model located in $(pwd)/models/model."""
-    if isinstance(x, np.ndarray):
-        x = x.tolist()
-    data = {'instances': x}
-    response = requests.post(TF_SERVING_URL, json=data)
-    if 'error' in response.json():
-        raise ValueError(response.json()['error'])
-    y_pred = response.json()['predictions']
-    return y_pred
-
-def calculate_metrics(y_true, y_pred, metrics):
-    """Calculate specified metrics from sklearn.metrics"""
     result = {}
-    for metric in metrics:
+    for metric in CLASSIFICATION_METRICS:
         try:
-            result[metric] = getattr(sklearn.metrics, metric)(y_true, y_pred)
+            try:
+                result[metric] = getattr(sklearn.metrics, metric)(y_test, y_pred)
+            except ValueError:
+                result[metric] = getattr(sklearn.metrics, metric)(y_test, y_pred, average='micro')
         except:
             pass
+
     return result
-
-def calculate_classification_metrics(y_true, y_pred):
-    return calculate_metrics(y_true, y_pred, CLASSIFICATION_METRICS)
-
-def calculate_regression_metrics(y_true, y_pred):
-    return calculate_metrics(y_true, y_pred, REGRESSION_METRICS)
-
-def evaluate_model(x_test, y_test, type_):
-    y_pred = predict(x_test)
-    if type_ == 'regression':
-        return calculate_regression_metrics(y_test, y_pred)
-    elif type_ == 'classification':
-        return calculate_classification_metrics(y_test, y_pred)
-    else:
-        raise NotImplementedError(f'Invalid type: {type_}')
 
 
 if __name__ == '__main__':
-    x_test = np.random.randint(0, 100, size=1000)
-    y_test = x_test / 2 + 2
-    pprint(evaluate_model(x_test, y_test, type_='regression'))
+    print(evaluate_model())
