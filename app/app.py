@@ -91,6 +91,7 @@ def upload_model():
             }, 400
         f.save(MODEL_NAME)
     except Exception as e:
+        app.logger.error(repr(e))
         return {
             'status': 'error',
             'message': str(e),
@@ -114,6 +115,7 @@ def upload_model_from_url():
         with open(MODEL_NAME, 'wb') as f:
             f.write(r.content)
     except Exception as e:
+        app.logger.error(repr(e))
         return {
             'status': 'error',
             'message': str(e),
@@ -143,6 +145,7 @@ def evaluate_model():
                 'message': f'Invalid type: {type_}',
             }, 400
     except Exception as e:
+        app.logger.error(repr(e))
         return {
             'status': 'error',
             'message': str(e),
