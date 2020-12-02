@@ -1,13 +1,18 @@
-import requests
 import numpy as np
 import keras
 import sklearn.metrics
-import os
 
 from conf import X_TEST_NAME, Y_TEST_NAME, MODEL_NAME
 from conf import CLASSIFICATION_METRICS, REGRESSION_METRICS
 
+
 def evaluate_classification_model():
+    """
+    Evaluate classification model on a test set. Both model and 
+    test set files should be located in the current directory. 
+    
+    Return dictionary of metrics.
+    """
     x_test = np.load(X_TEST_NAME)
     y_test = np.load(Y_TEST_NAME)
     model = keras.models.load_model(MODEL_NAME)
@@ -31,7 +36,14 @@ def evaluate_classification_model():
 
     return result
 
+
 def evaluate_regression_model():
+    """
+    Evaluate regression model on a test set. Both model and 
+    test set files should be located in the current directory. 
+    
+    Return dictionary of metrics.
+    """
     x_test = np.load(X_TEST_NAME)
     y_test = np.load(Y_TEST_NAME)
     model = keras.models.load_model(MODEL_NAME)
@@ -45,6 +57,7 @@ def evaluate_regression_model():
             pass
 
     return result
+
 
 if __name__ == '__main__':
     print(evaluate_regression_model())
