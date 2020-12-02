@@ -1,6 +1,0 @@
-numpy
-requests
-werkzeug
-flask
-sklearn
-keras
