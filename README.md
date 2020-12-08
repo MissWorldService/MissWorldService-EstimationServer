@@ -33,6 +33,11 @@ docker run -p 5000:5000 -v $(pwd)/app:/app -e FLASK_APP=main.py -e FLASK_DEBUG=1
 ```
 
 ## Production
+### Using docker-compose
 ```
 docker-compose -f docker-compose-prod.yml up
+```
+### Using Dockerfile
+```
+docker run -p 80:80 --restart=always a1d4r/flask-model-evaluation 
 ```
