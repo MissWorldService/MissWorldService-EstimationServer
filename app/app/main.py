@@ -1,15 +1,42 @@
 from flask import Flask, request
-from werkzeug.exceptions import BadRequestKeyError
+from werkzeug.local import Local
 import requests
 import numpy as np
 import zipfile 
 from zipfile import BadZipFile
 import io
+import os
+import time
 
 import model_metrics
 from conf import X_TEST_NAME, Y_TEST_NAME, MODEL_NAME
 
+
 app = Flask(__name__)
+loc = Local()
+
+with app.app_context():
+    if not hasattr(loc, 'routing_server_url'):
+        routing_server_url = os.getenv('ROUTING_SERVER_URL')
+        if not routing_server_url:
+            app.logger.error('Environmental variable ROUTING_SERVER_URL is not set.')
+            exit()
+        else:
+            loc.routing_server_url = routing_server_url
+            if not loc.routing_server_url.startswith('http://'):
+                loc.routing_server_url = 'http://' + loc.routing_server_url
+        
+        while True:
+            try:
+                requests.post(f'{loc.routing_server_url}/api/register_server', timeout=5)
+            except Exception as e:
+                app.logger.info(f'Failed to connect to the routing server: {e}')
+                time.sleep(10)
+            else:
+                break
+        
+        app.logger.info('Successfully connected to the routing server')
+
 
 @app.route('/ping/')
 def ping():

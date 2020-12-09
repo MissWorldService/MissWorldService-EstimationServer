@@ -1,7 +1,9 @@
 version: "3.8"
 services:
   web:
-    image: a1d4r/flask-model-evaluation
+    image: a1d4r/flask-model-evaluation:register
+    environment: 
+      - ROUTING_SERVER_URL=18.216.27.126:8080
     ports:
       - "80:80"
     restart: always
