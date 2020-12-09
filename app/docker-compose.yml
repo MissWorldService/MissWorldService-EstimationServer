@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+  web:
+    image: a1d4r/flask-model-evaluation
+    ports:
+      - "5000:80"

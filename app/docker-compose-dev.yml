@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  web:
+    image: a1d4r/flask-model-evaluation
+    ports:
+      - "5000:5000"
+    environment: 
+      - FLASK_APP=main.py 
+      - FLASK_DEBUG=1
+    volumes:
+      - ./app:/app
+    entrypoint: flask run --host=0.0.0.0 --port=5000
