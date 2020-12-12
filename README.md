@@ -1,6 +1,9 @@
 # Model Evaluating Server
 Microservice on Flask with REST API providing metrics for the given model and testset
 
+## API requests examples
+https://documenter.getpostman.com/view/11613270/TVmV4tL8
+
 ## How to run
 Firstly,
 ```
