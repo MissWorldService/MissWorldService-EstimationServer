@@ -152,7 +152,7 @@ def upload_model_from_url():
             'status': 'ok'
         }, 200
 
-@app.route('/evaluate/', methods=['GET'])
+@app.route('/evaluate/', methods=['POST'])
 def evaluate_model():
     try:
         try:
